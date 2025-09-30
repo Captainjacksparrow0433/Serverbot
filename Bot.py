@@ -222,7 +222,16 @@ async def relay_messages(update: Update, context: ContextTypes.DEFAULT_TYPE):
 @is_allowed
 async def flush_cmd(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await flush_output(context.bot)
+# -------------------------
+# AVR command wrappers
+# -------------------------
+@is_allowed
+async def avr_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await avr.menu(update, context)
 
+@is_allowed
+async def avr_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await avr.callback(update, context)
 # -------------------------
 # Boot/shutdown notification helpers
 # -------------------------
