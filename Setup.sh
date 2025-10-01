@@ -25,6 +25,7 @@ mkdir -p /etc/telegram-bot
 
 # Copy bot script (assuming files in same dir as setup.sh)
 cp telegram_shell_bot.py /opt/telegram-bot/
+cp notify.py /opt/telegram-bot/
 cp -r modules/* /opt/telegram-bot/modules/ || true
 
 # 🔹 Create config.py with ESP host
