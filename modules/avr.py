@@ -2,6 +2,7 @@ import requests
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
 from telegram.ext import ContextTypes
 from config import ESP_HOST
+from .auth import is_allowed
 
 # Function to define the inline keyboard for AVR control
 def get_avr_keyboard() -> InlineKeyboardMarkup:
@@ -33,11 +34,13 @@ def volume(direction: str) -> str:
         return f"❌ Failed: {e}"
 
 # Command: /avr
+@is_allowed
 async def avr_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     reply_markup = get_avr_keyboard()
     await update.message.reply_text("🎧 AVR Control:", reply_markup=reply_markup)
 
 # Handle button presses
+@is_allowed
 async def avr_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     data = query.data.split(":")
