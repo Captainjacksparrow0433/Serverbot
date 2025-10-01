@@ -18,6 +18,8 @@ import json
 from queue import Queue, Empty
 from modules import avr
 from modules.auth import is_allowed
+from modules.weather import weather_poll_job
+
 import requests
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
@@ -239,39 +241,6 @@ def send_startup_message(text):
 # -------------------------
 # Weather check function
 # -------------------------
-def fetch_weather_alerts():
-    if not OPENWEATHER_API_KEY or not LAT or not LON:
-        logger.info("Weather not configured (missing key/lat/lon)")
-        return None
-    # Using One Call/Current API to get alerts if present
-    # Minimal request:
-    url = f"https://api.openweathermap.org/data/2.5/onecall?lat={LAT}&lon={LON}&appid={OPENWEATHER_API_KEY}&exclude=minutely,hourly"
-    try:
-        r = requests.get(url, timeout=15)
-        r.raise_for_status()
-        data = r.json()
-        alerts = data.get("alerts", [])
-        return alerts
-    except Exception as ex:
-        logger.exception("weather fetch failed: %s", ex)
-        return None
-
-async def weather_poll_job(application):
-    alerts = fetch_weather_alerts()
-    if not alerts:
-        return
-    for alert in alerts:
-        sender = alert.get("sender_name", "")
-        event = alert.get("event", "")
-        desc = alert.get("description", "")
-        start = alert.get("start")
-        end = alert.get("end")
-        msg = f"Weather alert: *{event}* from _{sender}_\nStart: {start} End: {end}\n\n{desc}"
-        try:
-            await application.bot.send_message(chat_id=CHAT_ID, text=msg, parse_mode="Markdown")
-        except Exception as ex:
-            logger.exception("failed to send weather alert: %s", ex)
-
 # -------------------------
 # Main
 # -------------------------
@@ -285,6 +254,14 @@ def main():
     application.add_handler(CommandHandler("flush", flush_cmd))
     # any text message goes to relay (only when session open)
     application.add_handler(MessageHandler(filters.TEXT & (~filters.COMMAND), relay_messages))
+    if OPENWEATHER_API_KEY and LAT and LON:
+        application.job_queue.run_repeating(
+            weather_poll_job,
+            interval=WEATHER_POLL_MINUTES * 60,
+            first=10,  # Run the first job after 10 seconds to avoid a cold start delay
+            name="weather_poll"
+        )
+        logger.info(f"Weather polling scheduled for every {WEATHER_POLL_MINUTES} minutes.")
 
     # Scheduler for weather
 #    scheduler = AsyncIOScheduler()
