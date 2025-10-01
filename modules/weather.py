@@ -35,6 +35,8 @@ def fetch_current_weather():
         feels_like = data["main"]["feels_like"]
         humidity = data["main"]["humidity"]
         wind_speed = data["wind"]["speed"]
+        temp_min = data["main"]["temp_min"]
+        temp_max = data["main"]["temp_max"]
         
         # Return a dictionary with the parsed weather info
         return {
@@ -43,7 +45,9 @@ def fetch_current_weather():
             "temp": temp,
             "feels_like": feels_like,
             "humidity": humidity,
-            "wind_speed": wind_speed
+            "wind_speed": wind_speed,
+            "temp_min": temp_min,
+            "temp_max": temp_max
         }
         
     except requests.exceptions.HTTPError as http_err:
@@ -75,6 +79,8 @@ async def weather_report_job(application):
     feels = weather_data['feels_like']
     humidity = weather_data['humidity']
     wind = weather_data['wind_speed']
+    temp_min = weather_data['temp_min']
+    temp_max = weather_data['temp_max']
 
     # Using Markdown for nice formatting in Telegram
     msg = (
@@ -82,6 +88,8 @@ async def weather_report_job(application):
         f"*{desc}*\n\n"
         f"🌡️ Temperature: *{temp}°C*\n"
         f"🤔 Feels Like: *{feels}°C*\n"
+        f"🔼 Max Temp: *{temp_max}°C*\n"
+        f"🔽 Min Temp: *{temp_min}°C*\n"
         f"💧 Humidity: *{humidity}%*\n"
         f"💨 Wind Speed: *{wind} m/s*"
     )
