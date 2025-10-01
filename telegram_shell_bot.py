@@ -254,15 +254,13 @@ def main():
     # any text message goes to relay (only when session open)
     application.add_handler(MessageHandler(filters.TEXT & (~filters.COMMAND), relay_messages))
     if OPENWEATHER_API_KEY and OPENWEATHER_CITY:
-    application.job_queue.run_repeating(
-        weather_report_job,  # <-- Use the new function name
-        interval=WEATHER_REPORT_INTERVAL_MINUTES * 60,
-        first=10,  # Run the first job after 10 seconds, which is a good idea
-        name="weather_report" # <-- Renamed for clarity
+                                                 application.job_queue.run_repeating(
+                                                 weather_report_job,  # <-- Use the new function name
+                                                 interval=WEATHER_REPORT_INTERVAL_MINUTES * 60,
+                                                 first=10,  # Run the first job after 10 seconds, which is a good idea
+                                                 name="weather_report" # <-- Renamed for clarity
     )
     logger.info(f"Weather reporting scheduled for every {WEATHER_REPORT_INTERVAL_MINUTES} minutes.")
-else:
-    logger.warning("Weather report job not scheduled because OPENWEATHER_API_KEY or OPENWEATHER_CITY are not set.")
     # Scheduler for weather
 #    scheduler = AsyncIOScheduler()
 #    scheduler.add_job(weather_poll_job, "interval", minutes=WEATHER_POLL_MINUTES, args=[application])
