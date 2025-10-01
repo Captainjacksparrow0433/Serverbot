@@ -79,19 +79,23 @@ EOF
 # systemd notify service
 cat >/etc/systemd/system/telegram-boot-notify.service <<'EOF'
 [Unit]
-Description=Notify Telegram on boot/shutdown
+Description=Notify Telegram on boot and shutdown
+After=network-online.target
+Wants=network-online.target
 DefaultDependencies=no
-After=network.target
+Before=shutdown.target reboot.target halt.target
+Requires=network.target
 
 [Service]
 Type=oneshot
-EnvironmentFile=/etc/telegram-bot/env
-ExecStart=/opt/telegram-bot/venv/bin/python -c "import os; from telegram import Bot; Bot(os.environ['TELEGRAM_BOT_TOKEN']).send_message(chat_id=int(os.environ['ALLOWED_USER_ID']), text='✅ Server booted')"
-ExecStop=/opt/telegram-bot/venv/bin/python -c "import os; from telegram import Bot; Bot(os.environ['TELEGRAM_BOT_TOKEN']).send_message(chat_id=int(os.environ['ALLOWED_USER_ID']), text='⚠️ Server shutting down')"
 RemainAfterExit=yes
+EnvironmentFile=/etc/telegram-bot/env
+ExecStart=/opt/telegram-bot/notify.py boot
+ExecStopPost=/opt/telegram-bot/notify.py shutdown
+TimeoutStopSec=40s
 
 [Install]
-WantedBy=multi-user.target
+WantedBy=multi-user.target halt.target reboot.target shutdown.target
 EOF
 
 # Reload systemd and enable services
