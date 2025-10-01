@@ -16,12 +16,14 @@ import termios
 import errno
 import json
 from queue import Queue, Empty
-from modules import avr
+from modules import avr, auth
 
 import requests
 from apscheduler.schedulers.background import BackgroundScheduler
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
+from telegram.constants import ParseMode
 from telegram import Update, Bot
-from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, filters, ContextTypes
+from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, filters, ContextTypes, CallbackQueryHandler
 
 # -------------------------
 # Config from environment
@@ -50,17 +52,6 @@ logger = logging.getLogger("tg-shell-bot")
 # -------------------------
 # Simple auth decorator
 # -------------------------
-def is_allowed(func):
-    async def wrapper(update: Update, context: ContextTypes.DEFAULT_TYPE, *args, **kwargs):
-        uid = update.effective_user.id if update.effective_user else None
-        if uid != ALLOWED_USER_ID:
-            logger.warning("Denied access for user %s", uid)
-            if update.effective_message:
-                await update.effective_message.reply_text("Unauthorized.")
-            return
-        return await func(update, context, *args, **kwargs)
-    return wrapper
-
 # -------------------------
 # Single-command execution
 # -------------------------
@@ -284,10 +275,10 @@ async def weather_poll_job(application):
 # -------------------------
 # Main
 # -------------------------
-async def main():
+def main():
     application = ApplicationBuilder().token(BOT_TOKEN).build()
-    application.add_handler(CommandHandler("avr", avr.menu))
-    application.add_handler(CallbackQueryHandler(avr.callback, pattern="^avr:"))
+    application.add_handler(CommandHandler("avr", avr.avr_command))
+    application.add_handler(CallbackQueryHandler(avr.avr_callback, pattern="^avr:"))
     application.add_handler(CommandHandler("cmd", cmd_handler))
     application.add_handler(CommandHandler("shell_start", shell_start))
     application.add_handler(CommandHandler("shell_stop", shell_stop))
@@ -296,14 +287,13 @@ async def main():
     application.add_handler(MessageHandler(filters.TEXT & (~filters.COMMAND), relay_messages))
 
     # Scheduler for weather
-    scheduler = BackgroundScheduler()
-    scheduler.add_job(lambda: application.create_task(weather_poll_job(application)), "interval", minutes=WEATHER_POLL_MINUTES)
-    scheduler.start()
-
+#    scheduler = AsyncIOScheduler()
+#    scheduler.add_job(weather_poll_job, "interval", minutes=WEATHER_POLL_MINUTES, args=[application])
+#    scheduler.start()
+#    application.job_queue.run_repeating(weather_poll_job, interval=60, first=10)
     # Start bot
     logger.info("Starting Telegram bot")
-    await application.run_polling()
+    application.run_polling()
 
 if __name__ == "__main__":
-    import asyncio
-    asyncio.run(main())
+    main()
