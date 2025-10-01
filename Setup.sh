@@ -7,8 +7,8 @@ echo "=== Telegram Bot Setup ==="
 read -rp "Enter Telegram Bot Token: " BOT_TOKEN
 read -rp "Enter your Telegram User ID (numeric): " USER_ID
 read -rp "Enter OpenWeather API Key: " WEATHER_KEY
-read -rp "Enter Latitude: " LAT
-read -rp "Enter Longitude: " LON
+read -rp "Enter City Name: " LAT
+
 read -rp "Weather polling interval in minutes [15]: " POLL
 POLL=${POLL:-15}
 read -rp "Enter ESP32 Host (e.g. http://192.168.1.50): " ESP_HOST   # 🔹
@@ -41,7 +41,6 @@ TELEGRAM_BOT_TOKEN=${BOT_TOKEN}
 ALLOWED_USER_ID=${USER_ID}
 OPENWEATHER_API_KEY=${WEATHER_KEY}
 LAT=${LAT}
-LON=${LON}
 WEATHER_POLL_MINUTES=${POLL}
 EOF
 
@@ -56,6 +55,7 @@ python3 -m venv /opt/telegram-bot/venv
 source /opt/telegram-bot/venv/bin/activate
 pip install --upgrade pip
 pip install python-telegram-bot==20.5 requests APScheduler
+pip install "python-telegram-bot[job-queue]"
 deactivate
 
 # systemd service
