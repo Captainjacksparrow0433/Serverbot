@@ -11,7 +11,7 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(level
 # --- CONFIGURATION ---
 # Fetch config from environment variables
 OPENWEATHER_API_KEY = os.environ.get("OPENWEATHER_API_KEY")
-OPENWEATHER_CITY = os.environ.get("OPENWEATHER_CITY") # e.g., "Alappuzha"
+OPENWEATHER_CITY = os.environ.get("LAT") # e.g., "Alappuzha"
 CHAT_ID = os.environ.get("ALLOWED_USER_ID") # Your Telegram User/Chat ID
 
 def fetch_current_weather():
