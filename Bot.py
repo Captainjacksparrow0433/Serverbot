@@ -16,8 +16,8 @@ import termios
 import errno
 import json
 from queue import Queue, Empty
-from modules import avr, auth
-
+from modules import avr
+from modules.auth import is_allowed
 import requests
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
