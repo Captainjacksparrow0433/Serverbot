@@ -20,7 +20,7 @@ def is_allowed(func):
         if uid != ALLOWED_USER_ID:
             logger.warning("Denied access for user %s", uid)
             if update.effective_message:
-                await update.effective_message.reply_text("Unauthorized.")
+                await update.effective_message.reply_text("🚫Access Denied.")
             return
         return await func(update, context, *args, **kwargs)
     return wrapper
