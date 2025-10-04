@@ -10,8 +10,8 @@ logger = logging.getLogger(__name__)
 # Define your NAS paths here. The key is the "friendly name" for the button.
 # The value is the full, absolute path to the directory on your server.
 SAVE_PATHS = {
-    "Drive1️⃣": "/mnt/",
-    "Drive2️⃣": "/mnt/",
+    "Drive1️⃣": "/mnt/storage/Drive_1",
+    "Drive2️⃣": "/mnt/storage/Drive_2",
 }
 
 @is_allowed
