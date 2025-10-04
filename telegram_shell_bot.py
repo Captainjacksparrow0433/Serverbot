@@ -183,7 +183,7 @@ async def shell_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not ok:
         await update.message.reply_text(f"Failed: {msg}")
         return
-    await update.message.reply_text("Shell session started. Send messages and they will be written to the shell STDIN. Use /shell_stop to close. Prefix lines with `\\n` to send newline if needed.")
+    await update.message.reply_text("Shell session started. Send messages and they will be written to the shell STDIN. Use /sp to close. Prefix lines with `\\n` to send newline if needed.")
 
 @is_allowed
 async def shell_stop(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -248,8 +248,8 @@ def main():
     application.add_handler(CommandHandler("avr", avr.avr_command))
     application.add_handler(CallbackQueryHandler(avr.avr_callback, pattern="^avr:"))
     application.add_handler(CommandHandler("cmd", cmd_handler))
-    application.add_handler(CommandHandler("shell_start", shell_start))
-    application.add_handler(CommandHandler("shell_stop", shell_stop))
+    application.add_handler(CommandHandler("st", shell_start))
+    application.add_handler(CommandHandler("sp", shell_stop))
     application.add_handler(CommandHandler("flush", flush_cmd))
     # any text message goes to relay (only when session open)
     application.add_handler(MessageHandler(filters.TEXT & (~filters.COMMAND), relay_messages))
