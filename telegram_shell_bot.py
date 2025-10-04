@@ -16,7 +16,7 @@ import termios
 import errno
 import json
 from queue import Queue, Empty
-from modules import avr
+from modules import avr, file_uploader
 from modules.auth import is_allowed
 from modules.weather import weather_report_job
 
@@ -252,6 +252,9 @@ def main():
     application.add_handler(CommandHandler("sp", shell_stop))
     application.add_handler(CommandHandler("flush", flush_cmd))
     # any text message goes to relay (only when session open)
+    application.add_handler(MessageHandler(filters.Document.ALL | filters.VIDEO, file_uploader.file_upload_handler))
+    # This new CallbackQueryHandler listens for the button press and does the SAVING
+    application.add_handler(CallbackQueryHandler(file_uploader.file_upload_callback, pattern="^upload:"))
     application.add_handler(MessageHandler(filters.TEXT & (~filters.COMMAND), relay_messages))
     if OPENWEATHER_API_KEY and OPENWEATHER_CITY:
                                                  application.job_queue.run_repeating(
