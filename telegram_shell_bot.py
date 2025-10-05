@@ -244,7 +244,15 @@ def send_startup_message(text):
 # Main
 # -------------------------
 def main():
-    application = ApplicationBuilder().token(BOT_TOKEN).build()
+    application = (
+         ApplicationBuilder()
+        .token(BOT_TOKEN)
+        .base_url("http://127.0.0.1:8081/bot")
+        .base_file_url("http://127.0.0.1:8081/file/bot")
+        .build()
+    )
+    #testing
+    #application = ApplicationBuilder().token(BOT_TOKEN).build()
     application.add_handler(CommandHandler("avr", avr.avr_command))
     application.add_handler(CallbackQueryHandler(avr.avr_callback, pattern="^avr:"))
     application.add_handler(CommandHandler("cmd", cmd_handler))
